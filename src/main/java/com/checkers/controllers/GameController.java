@@ -39,7 +39,5 @@ public class GameController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new GameDTO(newGame));
     }
 
-    public record CreateGameRequest(long player1_id, long player2_id) {
-
-    }
+    public record CreateGameRequest(long player1_id, long player2_id) {}
 }

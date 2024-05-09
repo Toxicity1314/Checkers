@@ -35,7 +35,7 @@ public class Game {
     @JoinColumn(name = "winner_id")
     private Player winner;
 
-    @OneToMany(mappedBy="game")
+    @OneToMany(mappedBy="game", fetch = FetchType.EAGER)
     private Set<Piece> pieces;
 
 

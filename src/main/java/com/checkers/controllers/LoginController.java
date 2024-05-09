@@ -7,15 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/login")
 public class LoginController {
 
     private final AuthenticationManager authenticationManager;
@@ -27,8 +28,8 @@ public class LoginController {
         this.securityContextRepository = securityContextRepository;
     }
 
-    @PostMapping
-    public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         System.out.println("in LoginController");
         Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(loginRequest.username(),
                 loginRequest.password());
@@ -38,8 +39,27 @@ public class LoginController {
         SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
         this.securityContextRepository.saveContext(SecurityContextHolder.getContext(), request, null);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userName", userDetails.getUsername());
+        userInfo.put("authorities", userDetails.getAuthorities());
+        return ResponseEntity.status(HttpStatus.OK).body(userInfo);
     }
+    @GetMapping("/auth")
+    public ResponseEntity<?> auth() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            // Retrieve user details from authentication object if needed
+           UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            Map<String, Object> userInfo = new HashMap<>();
+            userInfo.put("userName", userDetails.getUsername());
+            userInfo.put("authorities", userDetails.getAuthorities());
+            return ResponseEntity.ok(userInfo);
+        } else {
+            return ResponseEntity.status(HttpStatus.SEE_OTHER).build();
+        }
+    }
+
 
     public record LoginRequest(String username, String password) {
     }

@@ -23,6 +23,7 @@ public class SecurityUser implements UserDetails {
     @Override
     public String getPassword() {
         return player.getPassword();
+//        return null;
     }
 
     @Override

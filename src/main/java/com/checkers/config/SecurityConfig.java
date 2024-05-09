@@ -8,12 +8,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.Message;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.socket.EnableWebSocketSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -56,10 +60,10 @@ public class SecurityConfig {
         return http
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/game").permitAll()
-                        .requestMatchers("/login", "/csrf", "/logout", "/game").permitAll() // mvcMatchers
+                        //.requestMatchers(HttpMethod.POST, "/game").permitAll()
+                        .requestMatchers("/login", "/csrf", "/logout", "/auth").permitAll() // mvcMatchers
                         .requestMatchers("/logout").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                       .anyRequest().authenticated())
                 .userDetailsService(jpaUserDetailsService)
                 .logout((logout) -> logout
                         .logoutUrl("/logout")

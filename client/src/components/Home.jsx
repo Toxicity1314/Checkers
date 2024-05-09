@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../context/User";
 
 function Home({ csrfToken }) {
   const [buttonPressed, setButtonPressed] = useState(true);
   const navigate = useNavigate();
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     fetch(`/api/player/32`)
@@ -12,7 +14,7 @@ function Home({ csrfToken }) {
       if (r.ok){
         r.json()
       .then((r) => {
-        console.log(r);
+        console.log(`in Home printing player ${r}`);
       })
 
       }else{
@@ -31,7 +33,7 @@ function Home({ csrfToken }) {
       },
     }).then((r) => {
             if (r.ok){
-              console.log(r);
+              setUser({ username: false, authorities: false })
             }else{
               console.error("Error fetching data:", r);
             }
@@ -41,6 +43,7 @@ function Home({ csrfToken }) {
   return (
     <div>
       <button onClick={() => handleClick()}>Logout</button>
+{/*       <button onClick={() => startNewGame()}> start game </button> */}
     </div>
   );
 }
